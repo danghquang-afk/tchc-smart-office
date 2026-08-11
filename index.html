@@ -3,344 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Phòng Tổ chức - Hành chính (BHXH)</title>
-    <!-- Tailwind CSS -->
+    <title>TCHC Smart Office - BHXH</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .active-tab { background-color: #eff6ff; color: #1e40af; font-weight: 800; border-right: 4px solid #1e40af; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased font-sans">
-
+<body class="bg-slate-50 text-slate-800 antialiased">
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0">
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
             <div>
-                <!-- Logo / Header -->
-                <div class="p-5 border-b border-slate-100 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md shadow-blue-900/20">
-                        TC
+                <div class="flex items-center gap-3 px-2 py-3 mb-6">
+                    <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center text-white font-black">
+                        <i class="fa-solid fa-microchip"></i>
                     </div>
                     <div>
-                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900">PHÒNG TC - HC</h1>
-                        <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Cơ quan BHXH</p>
+                        <h1 class="font-extrabold text-xs tracking-tight text-slate-900">TCHC OFFICE</h1>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">BHXH ĐÀ NẴNG</p>
                     </div>
                 </div>
 
-                <!-- Navigation -->
-                <nav class="mt-4 space-y-1 px-3">
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="sidebar-item active-tab w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[11px] font-extrabold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-chart-pie text-base w-5"></i> Tổng quan
-                    </button>
-                    <button onclick="switchTab('staff')" id="tab-staff" class="sidebar-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-blue-900 text-[11px] font-extrabold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-users-gear text-base w-5"></i> Danh sách 27 Cán bộ
-                    </button>
-                    <button onclick="switchTab('documents')" id="tab-documents" class="sidebar-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-blue-900 text-[11px] font-extrabold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-file-contract text-base w-5"></i> Văn bản - Quyết định
-                    </button>
+                <nav class="space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-house"></i> DASHBOARD
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-regular fa-calendar-days"></i> LỊCH CÔNG TÁC TUẦN
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-list-check"></i> NHIỆM VỤ THEO THÁNG
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-users"></i> DANH SÁCH 27 CÁN BỘ
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-file-arrow-up"></i> NHẬP VĂN BẢN / SỐ HÓA
+                    </a>
                 </nav>
             </div>
 
-            <!-- Footer Sidebar -->
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center text-xs font-bold">
-                        <i class="fa-solid fa-building-columns"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-extrabold text-slate-700">Thông báo 2988/QĐ-BHXH</p>
-                        <p class="text-[9px] text-slate-400 font-medium">Áp dụng từ: 05/08/2026</p>
-                    </div>
-                </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p class="text-[9px] font-bold text-slate-400 uppercase">Trạng thái hệ thống</p>
+                <p class="text-xs font-bold text-emerald-600 mt-0.5"><i class="fa-solid fa-circle text-[8px] mr-1"></i> V4.0 Hoạt động</p>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- TOP BAR -->
+        <!-- MAIN MAIN -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            <!-- HEADER -->
             <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">
-                        Cập nhật T8/2026
-                    </span>
-                    <h2 id="header-title" class="text-sm font-black text-slate-800 uppercase tracking-wide">Bảng Tổng quan Hệ thống</h2>
-                </div>
+                <h2 class="text-sm font-black text-slate-800 uppercase tracking-wide">BẢNG ĐIỀU HÀNH TCHC</h2>
                 <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" onkeyup="filterStaff()" placeholder="Tìm kiếm cán bộ, chức danh..." class="pl-9 pr-4 py-1.5 text-xs bg-slate-100 rounded-lg border-0 focus:ring-2 focus:ring-blue-900 focus:bg-white w-64 transition-all outline-none">
+                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+                        <i class="fa-regular fa-clock mr-1"></i> <span id="clock">13:37:53</span>
+                    </span>
+                    <button class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md">
+                        + NHIỆM VỤ MỚI
+                    </button>
+                    <div class="flex items-center gap-2 pl-4 border-l border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs">ĐQ</div>
+                        <div class="text-left">
+                            <p class="text-xs font-extrabold leading-none">Đặng Hồng Quang</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">TRƯỞNG PHÒNG TCHC</p>
+                        </div>
                     </div>
                 </div>
             </header>
 
             <!-- CONTENT BODY -->
-            <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
-                
-                <!-- VIEW 1: DASHBOARD -->
-                <section id="view-dashboard" class="space-y-6">
-                    <!-- Stat Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Tổng số Cán bộ</p>
-                                <h4 class="text-2xl font-black text-slate-800 mt-1">27</h4>
-                                <p class="text-[9px] font-bold text-blue-600 mt-1">100% Sẵn sàng</p>
-                            </div>
-                            <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
+            <div class="p-8 space-y-6">
+                <!-- STATS GRID -->
+                <div class="grid grid-cols-4 gap-5">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Lịch họp tuần này</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1">5</h3>
+                            <p class="text-[10px] text-blue-600 font-bold mt-1">Từ T2 đến T7</p>
                         </div>
+                        <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center text-xl"><i class="fa-regular fa-calendar-check"></i></div>
+                    </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Lãnh đạo Phòng</p>
-                                <h4 class="text-2xl font-black text-slate-800 mt-1">05</h4>
-                                <p class="text-[9px] font-bold text-emerald-600 mt-1">1 Trưởng + 4 Phó</p>
-                            </div>
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-user-tie"></i>
-                            </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng việc tháng 8</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1">4</h3>
+                            <p class="text-[10px] text-emerald-600 font-bold mt-1">1 việc đã hoàn thành</p>
                         </div>
+                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-list-check"></i></div>
+                    </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Tổ Nghiệp vụ</p>
-                                <h4 class="text-2xl font-black text-slate-800 mt-1">04</h4>
-                                <p class="text-[9px] font-bold text-amber-600 mt-1">Phân công đồng bộ</p>
-                            </div>
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-sitemap"></i>
-                            </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tiến độ chung</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1">56%</h3>
+                            <p class="text-[10px] text-amber-600 font-bold mt-1">Chỉ tiêu tháng</p>
                         </div>
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng số cán bộ</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1">27</h3>
+                            <p class="text-[10px] text-indigo-600 font-bold mt-1">100% Sẵn sàng</p>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                </div>
+
+                <!-- MAIN CHARTS AND SCHEDULE -->
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- CHART -->
+                    <div class="col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center">
                             <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Nghỉ Thai sản</p>
-                                <h4 class="text-2xl font-black text-slate-800 mt-1">02</h4>
-                                <p class="text-[9px] font-bold text-rose-500 mt-1">N.X.Minh & V.T.K.Cúc</p>
+                                <h3 class="text-xs font-black uppercase text-slate-800">Mật độ lịch công tác trong tuần</h3>
+                                <p class="text-[10px] text-slate-400 font-bold">Phân bố các cuộc họp và chương trình làm việc</p>
                             </div>
-                            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-user-clock"></i>
-                            </div>
+                            <span class="text-[10px] font-extrabold bg-blue-50 text-blue-900 px-3 py-1 rounded-full">TUẦN HIỆN TẠI</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="weeklyChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Structure Overview Table -->
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-xs font-black uppercase text-slate-800 tracking-wider">Tóm tắt Phân công Tổ nghiệp vụ</h3>
-                            <span class="text-[10px] font-bold text-slate-400">BHXH Khu vực / T8/2026</span>
+                    <!-- TODAY SCHEDULE -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="text-xs font-black uppercase text-slate-800">Lịch họp hôm nay</h3>
+                            <a href="#" class="text-[10px] font-bold text-blue-900">Xem tất cả</a>
                         </div>
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-extrabold text-xs text-blue-900">1. Lãnh đạo Phòng</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">5 nhân sự</span>
-                                </div>
-                                <p class="text-xs text-slate-600">Trưởng phòng: Đặng Hồng Quang. Phụ trách chung và trực tiếp điều hành toàn bộ công tác chuyên môn.</p>
-                            </div>
-
-                            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-extrabold text-xs text-blue-900">2. Tổ Tổ chức cán bộ - Chế độ tiền lương</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">3 nhân sự</span>
-                                </div>
-                                <p class="text-xs text-slate-600">Đầu mối: Hồ Thị Thùy Trang. Quản lý quy hoạch, bổ nhiệm, tiền lương và công tác Đảng.</p>
-                            </div>
-
-                            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-extrabold text-xs text-blue-900">3. Tổ Pháp chế - Cải cách HĐ - Tổng hợp</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">4 nhân sự</span>
-                                </div>
-                                <p class="text-xs text-slate-600">Phụ trách thi đua khen thưởng, pháp chế quy chế và báo cáo tổng hợp cơ quan.</p>
-                            </div>
-
-                            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-extrabold text-xs text-blue-900">4. Tổ Văn phòng - Quản trị - Bộ phận Một cửa</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">15 nhân sự</span>
-                                </div>
-                                <p class="text-xs text-slate-600">Văn thư, Quản trị CSVC, Đội Lái xe (4 xe), Đội Bảo vệ/Tạp vụ và Bộ phận Tiếp nhận kết quả (4 cán bộ).</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- VIEW 2: STAFF LIST -->
-                <section id="view-staff" class="hidden space-y-6">
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
-                            <h3 class="text-xs font-black uppercase text-slate-800 tracking-wider">Danh bạ & Hồ sơ 27 Cán bộ - Viên chức</h3>
-                            <div class="flex gap-2">
-                                <button class="px-3 py-1.5 text-xs font-extrabold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-all">
-                                    <i class="fa-solid fa-file-excel mr-1"></i> Xuất Excel
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Table -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50/80 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                                        <th class="p-4 pl-6">STT</th>
-                                        <th class="p-4">Họ và Tên</th>
-                                        <th class="p-4">Chức danh / Nhiệm vụ</th>
-                                        <th class="p-4">Tổ / Bộ phận Phụ trách</th>
-                                        <th class="p-4 pr-6 text-right">Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="staffTableBody" class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
-                                    <!-- Dynamic rows from JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- VIEW 3: DOCUMENTS -->
-                <section id="view-documents" class="hidden space-y-6">
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                        <h3 class="text-xs font-black uppercase text-slate-800 tracking-wider mb-4">Văn bản & Quyết định Liên quan</h3>
-                        <div class="p-4 border border-blue-100 bg-blue-50/40 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 bg-blue-900 text-white rounded-lg flex items-center justify-center text-lg">
-                                    <i class="fa-solid fa-file-pdf"></i>
-                                </div>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
                                 <div>
-                                    <h4 class="text-xs font-extrabold text-slate-900">Thông báo số 2988/QĐ-BHXH</h4>
-                                    <p class="text-[10px] text-slate-500">Phân công nhiệm vụ đối với công chức, viên chức và người lao động Phòng TC-HC (Ngày 05/08/2026)</p>
+                                    <p class="text-xs font-bold text-slate-800">Giao ban Lãnh đạo cơ quan</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">Đặng Hồng Quang</p>
                                 </div>
+                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">08:00</span>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
-                                Đang áp dụng
-                            </span>
+
+                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800">Rà soát hồ sơ nâng lương đợt 2</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">Trần Quốc Hoàn</p>
+                                </div>
+                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">14:00</span>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800">Kiểm tra công tác an toàn văn phòng</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">Huỳnh Thanh Ti</p>
+                                </div>
+                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">09:00</span>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800">Đào tạo kỹ năng số cho CB Một cửa</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">Nguyễn Thị Minh Thư</p>
+                                </div>
+                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">15:00</span>
+                            </div>
                         </div>
                     </div>
-                </section>
-
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // DANH SÁCH TOÀN BỘ 27 VIÊN CHỨC & NLĐ THEO QĐ 2988/QĐ-BHXH (05/08/2026)
-        const STAFF_DATA = [
-            // LÃNH ĐẠO PHÒNG
-            { id: 1, name: "Đặng Hồng Quang", role: "Trưởng phòng", group: "Lãnh đạo Phòng", status: "Active" },
-            { id: 2, name: "Huỳnh Thanh Ti", role: "Phó Trưởng phòng", group: "Lãnh đạo Phòng", status: "Active" },
-            { id: 3, name: "Nguyễn Thành Nam", role: "Phó Trưởng phòng", group: "Lãnh đạo Phòng", status: "Active" },
-            { id: 4, name: "Trần Quốc Hoàn", role: "Phó Trưởng phòng", group: "Lãnh đạo Phòng", status: "Active" },
-            { id: 5, name: "Nguyễn Thị Minh Thư", role: "Phó Trưởng phòng", group: "Lãnh đạo Phòng", status: "Active" },
+        // Realtime Clock
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
+        }, 1000);
 
-            // NHÓM TỔ CHỨC CÁN BỘ - CHẾ ĐỘ TIỀN LƯƠNG
-            { id: 6, name: "Hồ Thị Thùy Trang", role: "Chuyên viên (Đầu mối TCCB)", group: "Tổ chức cán bộ", status: "Active" },
-            { id: 7, name: "Nguyễn Anh Dũng", role: "Chuyên viên (Đảng ủy - CNTT)", group: "Tổ chức cán bộ", status: "Active" },
-            { id: 8, name: "Võ Thị Quế Phương", role: "Chuyên viên (Tiền lương - Nhân sự)", group: "Tổ chức cán bộ", status: "Active" },
-
-            // NHÓM PHÁP CHẾ - CẢI CÁCH HÀNH CHÍNH - TỔNG HỢP
-            { id: 9, name: "Đặng Thị Thùy Dung", role: "Chuyên viên (Thi đua - Khen thưởng)", group: "Pháp chế - CCHC", status: "Active" },
-            { id: 10, name: "Đinh Hoàng Nữ Vi", role: "Chuyên viên (Pháp chế - Quy chế)", group: "Pháp chế - CCHC", status: "Active" },
-            { id: 11, name: "Đỗ Thị Sự", role: "Chuyên viên (Tổng hợp - Báo cáo)", group: "Pháp chế - CCHC", status: "Active" },
-            { id: 12, name: "Nguyễn Xuân Minh", role: "Chuyên viên", group: "Pháp chế - CCHC", status: "Maternity" },
-
-            // NHÓM VĂN PHÒNG - QUẢN TRỊ
-            { id: 13, name: "Nguyễn Thị Thu Hà", role: "Nhân viên (Văn thư cơ quan)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 14, name: "Lê Viết Thành", role: "Nhân viên (Quản trị CSVC)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 15, name: "Lê Văn Anh Cường", role: "Nhân viên Lái xe (92A-004.95)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 16, name: "Ngô Sỹ Dũng", role: "Nhân viên Lái xe (92A-003.57)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 17, name: "Võ Ngọc Trung", role: "Nhân viên Lái xe (92A-003.19)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 18, name: "Lý Văn Thanh", role: "Nhân viên Lái xe (92A-004.87)", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 19, name: "Phùng Tấn Thông", role: "Nhân viên Bảo vệ", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 20, name: "Đàm Quang Sơn", role: "Nhân viên Bảo vệ", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 21, name: "Mai Trọng Anh", role: "Nhân viên Bảo vệ", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 22, name: "Trương Thị Lan Thanh", role: "Nhân viên Bảo vệ kiêm Tạp vụ", group: "Văn phòng - Quản trị", status: "Active" },
-            { id: 23, name: "Lê Thị Mỹ Linh", role: "Nhân viên Bảo vệ kiêm Tạp vụ", group: "Văn phòng - Quản trị", status: "Active" },
-
-            // BỘ PHẬN MỘT CỬA - LƯU TRỮ
-            { id: 24, name: "Nguyễn Thị Nga", role: "Chuyên viên (Một cửa Thu, Sổ-Thẻ)", group: "Bộ phận Một cửa", status: "Active" },
-            { id: 25, name: "Trần Nguyễn Anh Thư", role: "Chuyên viên (Một cửa Chính sách BHXH)", group: "Bộ phận Một cửa", status: "Active" },
-            { id: 26, name: "Võ Thị Noel", role: "Cán sự (Một cửa BHXH 1 lần)", group: "Bộ phận Một cửa", status: "Active" },
-            { id: 27, name: "Võ Thị Kim Cúc", role: "Cán sự", group: "Bộ phận Một cửa", status: "Maternity" }
-        ];
-
-        // RENDER TABLE
-        function renderStaffTable(data) {
-            const tbody = document.getElementById('staffTableBody');
-            tbody.innerHTML = '';
-
-            data.forEach((item) => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors";
-
-                let statusBadge = item.status === 'Active' 
-                    ? `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Đang công tác</span>`
-                    : `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200">Nghỉ thai sản</span>`;
-
-                row.innerHTML = `
-                    <td class="p-4 pl-6 text-slate-400 font-bold">${item.id}</td>
-                    <td class="p-4 font-bold text-slate-900">${item.name}</td>
-                    <td class="p-4 text-slate-600">${item.role}</td>
-                    <td class="p-4"><span class="px-2 py-0.5 bg-slate-100 rounded text-[11px] font-semibold text-slate-700">${item.group}</span></td>
-                    <td class="p-4 pr-6 text-right">${statusBadge}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // TAB SWITCHING LOGIC
-        function switchTab(tabName) {
-            // Hide all views
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-staff').classList.add('hidden');
-            document.getElementById('view-documents').classList.add('hidden');
-
-            // Reset tab styles
-            document.querySelectorAll('.sidebar-item').forEach(btn => {
-                btn.classList.remove('active-tab');
-                btn.classList.add('text-slate-500');
-            });
-
-            // Show selected view & highlight tab
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.add('active-tab');
-
-            // Update Header Title
-            const titleMap = {
-                'dashboard': 'Bảng Tổng quan Hệ thống',
-                'staff': 'Danh sách & Phân công Cán bộ (27 Nhân sự)',
-                'documents': 'Văn bản - Quyết định Phân công'
-            };
-            document.getElementById('header-title').innerText = titleMap[tabName];
-        }
-
-        // SEARCH FILTER
-        function filterStaff() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = STAFF_DATA.filter(item => 
-                item.name.toLowerCase().includes(query) || 
-                item.role.toLowerCase().includes(query) ||
-                item.group.toLowerCase().includes(query)
-            );
-            renderStaffTable(filtered);
-            
-            // Auto switch to staff view when typing in search
-            if (query.trim() !== '') {
-                switchTab('staff');
+        // Chart.js Setup
+        const ctx = document.getElementById('weeklyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'],
+                datasets: [{
+                    label: 'Số cuộc họp',
+                    data: [2, 1, 0, 1, 1, 0],
+                    backgroundColor: '#1e3a8a',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                }
             }
-        }
-
-        // INIT ON LOAD
-        document.addEventListener('DOMContentLoaded', () => {
-            renderStaffTable(STAFF_DATA);
         });
     </script>
 </body>
