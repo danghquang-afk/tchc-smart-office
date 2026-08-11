@@ -3,352 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCHC Smart Office - BHXH</title>
-    <!-- Tailwind CSS -->
+    <title>TCHC Smart Office · BHXH TP Đà Nẵng</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .active-menu { background-color: #1e3a8a !important; color: #ffffff !important; }
+        .active-menu i { color: #ffffff !important; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        @media print { .no-print { display: none !important; } main { overflow: visible !important; } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased">
+<body class="bg-slate-100 text-slate-800 antialiased">
     <div class="flex h-screen overflow-hidden">
+        <!-- OVERLAY (mobile) -->
+        <div id="overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/40 z-30 hidden md:hidden"></div>
+
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
-            <div>
+        <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4 fixed md:static inset-y-0 left-0 z-40 -translate-x-full md:translate-x-0 transition-transform no-print">
+            <div class="overflow-y-auto">
                 <div class="flex items-center gap-3 px-2 py-3 mb-6">
-                    <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center text-white font-black">
-                        <i class="fa-solid fa-microchip"></i>
+                    <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center text-white font-black shrink-0">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
                         <h1 class="font-extrabold text-xs tracking-tight text-slate-900">TCHC OFFICE</h1>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">BHXH ĐÀ NẴNG</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">BHXH TP ĐÀ NẴNG</p>
                     </div>
                 </div>
 
                 <nav class="space-y-1">
                     <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active-menu w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-house"></i> DASHBOARD
+                        <i class="fa-solid fa-house w-4"></i> Bảng điều hành
                     </button>
                     <button onclick="switchView('tasks')" id="nav-tasks" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-list-check"></i> NHIỆM VỤ THEO THÁNG
+                        <i class="fa-solid fa-list-check w-4"></i> Nhiệm vụ
+                    </button>
+                    <button onclick="switchView('areas')" id="nav-areas" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
+                        <i class="fa-solid fa-diagram-project w-4"></i> Lĩnh vực công tác
                     </button>
                     <button onclick="switchView('staff')" id="nav-staff" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                        <i class="fa-solid fa-users"></i> DANH SÁCH 27 CÁN BỘ
+                        <i class="fa-solid fa-users w-4"></i> Cán bộ Phòng
+                    </button>
+                    <button onclick="switchView('schedule')" id="nav-schedule" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
+                        <i class="fa-regular fa-calendar-days w-4"></i> Lịch công tác tuần
                     </button>
                 </nav>
+
+                <div class="mt-6 pt-4 border-t border-slate-100">
+                    <p class="px-2 text-[9px] font-bold text-slate-400 uppercase mb-2">Dữ liệu</p>
+                    <button onclick="exportData()" class="w-full flex items-center gap-3 px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-[11px] font-bold transition-all">
+                        <i class="fa-solid fa-download w-4"></i> Xuất sao lưu
+                    </button>
+                    <button onclick="document.getElementById('import-file').click()" class="w-full flex items-center gap-3 px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-[11px] font-bold transition-all">
+                        <i class="fa-solid fa-upload w-4"></i> Nhập sao lưu
+                    </button>
+                    <input type="file" id="import-file" accept="application/json" class="hidden" onchange="importData(event)">
+                    <button onclick="resetData()" class="w-full flex items-center gap-3 px-4 py-2.5 text-rose-500 hover:bg-rose-50 rounded-xl text-[11px] font-bold transition-all">
+                        <i class="fa-solid fa-rotate-left w-4"></i> Khôi phục mặc định
+                    </button>
+                </div>
             </div>
 
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <p class="text-[9px] font-bold text-slate-400 uppercase">Trạng thái hệ thống</p>
-                <p class="text-xs font-bold text-emerald-600 mt-0.5"><i class="fa-solid fa-circle text-[8px] mr-1"></i> V4.0 Hoạt động</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase">Căn cứ pháp lý</p>
+                <p class="text-[10px] font-bold text-slate-600 mt-0.5 leading-snug">Điều 8 QĐ 2988/QĐ-BHXH · Thông báo phân công 05/8/2026</p>
+                <p class="text-[10px] font-bold text-emerald-600 mt-1.5"><i class="fa-solid fa-circle text-[7px] mr-1"></i> V5.0 Hoạt động</p>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN -->
         <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-            <!-- HEADER -->
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
-                <h2 id="page-title" class="text-sm font-black text-slate-800 uppercase tracking-wide">BẢNG ĐIỀU HÀNH TCHC</h2>
-                <div class="flex items-center gap-4">
-                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 sticky top-0 z-20 no-print">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="toggleSidebar(true)" class="md:hidden text-slate-500 text-lg"><i class="fa-solid fa-bars"></i></button>
+                    <h2 id="page-title" class="text-sm font-black text-slate-800 uppercase tracking-wide truncate">Bảng điều hành TCHC</h2>
+                </div>
+                <div class="flex items-center gap-3 md:gap-4">
+                    <span class="hidden sm:inline text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
                         <i class="fa-regular fa-clock mr-1"></i> <span id="clock">--:--:--</span>
                     </span>
-                    <button onclick="openModal()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md">
-                        + NHIỆM VỤ MỚI
+                    <button onclick="openTaskModal()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-3 md:px-4 py-2 rounded-xl transition-all shadow-md">
+                        <i class="fa-solid fa-plus mr-1"></i> Nhiệm vụ
                     </button>
-                    <div class="flex items-center gap-2 pl-4 border-l border-slate-200">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs">ĐQ</div>
-                        <div class="text-left">
+                    <div class="flex items-center gap-2 pl-3 md:pl-4 border-l border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs shrink-0">ĐQ</div>
+                        <div class="text-left hidden md:block">
                             <p class="text-xs font-extrabold leading-none">Đặng Hồng Quang</p>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">TRƯỞNG PHÒNG TCHC</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Trưởng phòng TCHC</p>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- VIEW 1: DASHBOARD -->
-            <div id="view-dashboard" class="p-8 space-y-6">
-                <!-- STATS GRID -->
-                <div class="grid grid-cols-4 gap-5">
+            <!-- ===== DASHBOARD ===== -->
+            <section id="view-dashboard" class="p-4 md:p-8 space-y-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Lịch họp tuần này</p>
-                            <h3 class="text-2xl font-black text-slate-800 mt-1">5</h3>
-                            <p class="text-[10px] text-blue-600 font-bold mt-1">Từ T2 đến T7</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng nhiệm vụ</p>
+                            <h3 id="stat-total" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            <p class="text-[10px] text-blue-600 font-bold mt-1"><span id="stat-done">0</span> đã hoàn thành</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center text-xl"><i class="fa-regular fa-calendar-check"></i></div>
+                        <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-list-check"></i></div>
                     </div>
-
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng việc tháng 8</p>
-                            <h3 id="stat-total-tasks" class="text-2xl font-black text-slate-800 mt-1">0</h3>
-                            <p class="text-[10px] text-emerald-600 font-bold mt-1"><span id="stat-done-tasks">0</span> việc đã hoàn thành</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Đang thực hiện</p>
+                            <h3 id="stat-progress-count" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            <p class="text-[10px] text-amber-600 font-bold mt-1">Cần theo dõi tiến độ</p>
                         </div>
-                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-list-check"></i></div>
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-spinner"></i></div>
                     </div>
-
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tiến độ chung</p>
-                            <h3 id="stat-progress" class="text-2xl font-black text-slate-800 mt-1">0%</h3>
-                            <p class="text-[10px] text-amber-600 font-bold mt-1">Chỉ tiêu tháng</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Quá hạn</p>
+                            <h3 id="stat-overdue" class="text-2xl font-black text-rose-600 mt-1">0</h3>
+                            <p class="text-[10px] text-rose-500 font-bold mt-1"><span id="stat-soon">0</span> sắp đến hạn (≤3 ngày)</p>
                         </div>
-                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     </div>
-
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Tổng số cán bộ</p>
-                            <h3 class="text-2xl font-black text-slate-800 mt-1">27</h3>
-                            <p class="text-[10px] text-indigo-600 font-bold mt-1">100% Sẵn sàng</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Cán bộ Phòng</p>
+                            <h3 id="stat-staff" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            <p class="text-[10px] text-indigo-600 font-bold mt-1"><span id="stat-onduty">0</span> công tác · <span id="stat-leave">0</span> nghỉ chế độ</p>
                         </div>
                         <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
                     </div>
                 </div>
 
-                <!-- CHARTS AND SCHEDULE -->
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex justify-between items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center flex-wrap gap-2">
                             <div>
-                                <h3 class="text-xs font-black uppercase text-slate-800">Mật độ lịch công tác trong tuần</h3>
-                                <p class="text-[10px] text-slate-400 font-bold">Phân bố các cuộc họp và chương trình làm việc</p>
+                                <h3 class="text-xs font-black uppercase text-slate-800">Khối lượng nhiệm vụ theo nhóm</h3>
+                                <p class="text-[10px] text-slate-400 font-bold">Phân bổ đầu việc giữa 5 nhóm/bộ phận</p>
                             </div>
-                            <span class="text-[10px] font-extrabold bg-blue-50 text-blue-900 px-3 py-1 rounded-full">TUẦN HIỆN TẠI</span>
+                            <span class="text-[10px] font-extrabold bg-blue-50 text-blue-900 px-3 py-1 rounded-full">TỔNG QUAN</span>
                         </div>
-                        <div class="h-64">
-                            <canvas id="weeklyChart"></canvas>
+                        <div class="h-64"><canvas id="groupChart"></canvas></div>
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                                <span>Tiến độ chung của Phòng</span><span id="progress-label">0%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-emerald-500 rounded-full transition-all" style="width:0%"></div>
+                            </div>
                         </div>
                     </div>
-
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                            <h3 class="text-xs font-black uppercase text-slate-800">Lịch họp hôm nay</h3>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs font-bold text-slate-800">Giao ban Lãnh đạo cơ quan</p>
-                                    <p class="text-[10px] text-slate-400 font-medium">Đặng Hồng Quang</p>
-                                </div>
-                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">08:00</span>
-                            </div>
-                            <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs font-bold text-slate-800">Rà soát hồ sơ nâng lương đợt 2</p>
-                                    <p class="text-[10px] text-slate-400 font-medium">Trần Quốc Hoàn</p>
-                                </div>
-                                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">14:00</span>
-                            </div>
-                        </div>
+                        <h3 class="text-xs font-black uppercase text-slate-800">Cơ cấu trạng thái</h3>
+                        <div class="h-52"><canvas id="statusChart"></canvas></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- VIEW 2: TASKS MANAGEMENT -->
-            <div id="view-tasks" class="p-8 hidden space-y-4">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xs font-black uppercase text-slate-800 mb-4">Danh sách Nhiệm vụ Công tác Tháng</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="text-xs font-black uppercase text-slate-800"><i class="fa-solid fa-bell text-rose-500 mr-1"></i> Quá hạn & sắp đến hạn</h3>
+                            <button onclick="switchView('tasks')" class="text-[10px] font-bold text-blue-900 hover:underline">Xem tất cả</button>
+                        </div>
+                        <div id="alert-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="text-xs font-black uppercase text-slate-800"><i class="fa-regular fa-calendar-check text-blue-900 mr-1"></i> Lịch công tác hôm nay</h3>
+                            <button onclick="switchView('schedule')" class="text-[10px] font-bold text-blue-900 hover:underline">Lịch tuần</button>
+                        </div>
+                        <div id="today-schedule" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TASKS ===== -->
+            <section id="view-tasks" class="p-4 md:p-8 space-y-4 hidden">
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                            <input id="filter-search" oninput="renderTasks()" type="text" placeholder="Tìm nhiệm vụ / cán bộ..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                        </div>
+                        <select id="filter-group" onchange="renderTasks()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900"></select>
+                        <select id="filter-assignee" onchange="renderTasks()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900"></select>
+                        <select id="filter-status" onchange="renderTasks()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Đang thực hiện">Đang thực hiện</option>
+                            <option value="Hoàn thành">Hoàn thành</option>
+                            <option value="Tạm dừng">Tạm dừng</option>
+                            <option value="__overdue">⚠ Quá hạn</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="text-xs font-black uppercase text-slate-800">Danh sách nhiệm vụ · <span id="task-count" class="text-blue-900">0</span></h3>
+                        <button onclick="openTaskModal()" class="text-xs font-bold text-blue-900 hover:underline"><i class="fa-solid fa-plus mr-1"></i>Thêm nhiệm vụ</button>
+                    </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[820px]">
                             <thead>
                                 <tr class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
-                                    <th class="p-3">Tên nhiệm vụ</th>
-                                    <th class="p-3">Người phụ trách</th>
+                                    <th class="p-3">Nhiệm vụ / Sản phẩm đầu ra</th>
+                                    <th class="p-3">Nhóm · Lĩnh vực</th>
+                                    <th class="p-3">Phụ trách</th>
+                                    <th class="p-3">Ưu tiên</th>
                                     <th class="p-3">Thời hạn</th>
                                     <th class="p-3">Trạng thái</th>
                                     <th class="p-3 text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="tasks-table-body" class="text-xs divide-y divide-slate-100 font-medium">
-                                <!-- Dynamic Rows -->
-                            </tbody>
+                            <tbody id="tasks-table-body" class="text-xs divide-y divide-slate-100 font-medium"></tbody>
                         </table>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- VIEW 3: STAFF LIST -->
-            <div id="view-staff" class="p-8 hidden space-y-4">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xs font-black uppercase text-slate-800 mb-4">Danh sách 27 Cán bộ Phòng TC-HC</h3>
-                    <p class="text-xs text-slate-500">Mọi dữ liệu phân công nhiệm vụ cán bộ đã được cập nhật đồng bộ theo Thông báo 2988/QĐ-BHXH áp dụng từ 05/08/2026.</p>
+            <!-- ===== AREAS (Phụ lục IX) ===== -->
+            <section id="view-areas" class="p-4 md:p-8 space-y-4 hidden">
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-slate-800">Ma trận phân công theo lĩnh vực · Phụ lục IX</h3>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">22 lĩnh vực · mỗi lĩnh vực 01 đầu mối chịu trách nhiệm chính</p>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                        <input id="area-search" oninput="renderAreas()" type="text" placeholder="Tìm lĩnh vực / đầu mối..." class="text-xs bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                    </div>
                 </div>
-            </div>
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[760px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                <th class="p-3 w-8">#</th>
+                                <th class="p-3">Lĩnh vực công tác</th>
+                                <th class="p-3">Lãnh đạo phụ trách</th>
+                                <th class="p-3">Đầu mối thực hiện</th>
+                                <th class="p-3">Sản phẩm đầu ra</th>
+                                <th class="p-3 text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="areas-table-body" class="text-xs divide-y divide-slate-100 font-medium"></tbody>
+                    </table>
+                </div>
+
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black uppercase text-slate-800 mb-4"><i class="fa-solid fa-gauge-high text-blue-900 mr-1"></i> Bộ chỉ số đánh giá kết quả (KPI) · Mục VIII.3</h3>
+                    <div id="kpi-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 md:p-5">
+                    <p class="text-[11px] font-bold text-blue-900 mb-1"><i class="fa-solid fa-sitemap mr-1"></i> Cơ chế tham mưu Đảng ủy theo 3 tầng</p>
+                    <p class="text-[11px] text-blue-800 font-medium leading-relaxed">Trưởng phòng <b>Đặng Hồng Quang</b> quyết định chủ trương → Phó Trưởng phòng <b>Trần Quốc Hoàn</b> điều phối, xử lý hằng ngày → Chuyên viên <b>Nguyễn Anh Dũng</b> thực hiện tác nghiệp cụ thể. Không bỏ qua tầng điều phối khi xử lý công việc phát sinh.</p>
+                </div>
+            </section>
+
+            <!-- ===== STAFF ===== -->
+            <section id="view-staff" class="p-4 md:p-8 space-y-4 hidden">
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-slate-800">Danh sách cán bộ, viên chức & người lao động</h3>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">Cập nhật theo Thông báo phân công nhiệm vụ (áp dụng từ 01/8/2026)</p>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                        <input id="staff-search" oninput="renderStaff()" type="text" placeholder="Tìm cán bộ / vị trí..." class="text-xs bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                    </div>
+                </div>
+                <div id="staff-container" class="space-y-6"></div>
+            </section>
+
+            <!-- ===== SCHEDULE ===== -->
+            <section id="view-schedule" class="p-4 md:p-8 space-y-4 hidden">
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-slate-800">Lịch công tác trong tuần</h3>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">Các cuộc họp, chương trình, sự kiện của Phòng và cơ quan</p>
+                    </div>
+                    <button onclick="openScheduleModal()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md"><i class="fa-solid fa-plus mr-1"></i> Thêm lịch</button>
+                </div>
+                <div id="schedule-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+            </section>
         </main>
     </div>
 
-    <!-- MODAL NEW TASK -->
-    <div id="taskModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md overflow-hidden">
-            <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-xs font-black text-slate-800 uppercase">Thêm Nhiệm vụ Công tác Mới</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
+    <!-- ===== TASK MODAL ===== -->
+    <div id="taskModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden max-h-[92vh] flex flex-col">
+            <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h3 id="task-modal-title" class="text-xs font-black text-slate-800 uppercase">Thêm nhiệm vụ công tác</h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <form onsubmit="saveNewTask(event)" class="p-6 space-y-4">
+            <form onsubmit="saveTask(event)" class="p-6 space-y-4 overflow-y-auto">
+                <input type="hidden" id="task-id">
                 <div>
-                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Tên nhiệm vụ</label>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Tên nhiệm vụ *</label>
                     <input type="text" id="task-title" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="Nhập tên nhiệm vụ...">
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Người phụ trách</label>
-                    <input type="text" id="task-assignee" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="Tên cán bộ phụ trách...">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Nhóm / Bộ phận *</label>
+                        <select id="task-group" required onchange="fillAssigneeSelect('task-assignee', this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Người phụ trách *</label>
+                        <select id="task-assignee" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900"></select>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Hạn hoàn thành</label>
-                    <input type="date" id="task-deadline" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Lĩnh vực công tác (Phụ lục IX)</label>
+                    <select id="task-area" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900"></select>
                 </div>
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl">Hủy</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Độ ưu tiên</label>
+                        <select id="task-priority" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                            <option>Cao</option><option selected>Trung bình</option><option>Thấp</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Hạn hoàn thành *</label>
+                        <input type="date" id="task-deadline" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Sản phẩm đầu ra</label>
+                    <input type="text" id="task-product" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="VD: Tờ trình, quyết định, báo cáo...">
+                </div>
+                <div id="task-status-wrap" class="hidden">
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Trạng thái</label>
+                    <select id="task-status" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                        <option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Ghi chú</label>
+                    <textarea id="task-note" rows="2" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="Nội dung phối hợp, lưu ý..."></textarea>
+                </div>
+                <div class="pt-1 flex justify-end gap-2">
+                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl">Hủy</button>
                     <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-blue-900 rounded-xl">Lưu nhiệm vụ</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- ===== SCHEDULE MODAL ===== -->
+    <div id="scheduleModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-xs font-black text-slate-800 uppercase">Thêm lịch công tác</h3>
+                <button onclick="closeScheduleModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="saveSchedule(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Nội dung *</label>
+                    <input type="text" id="sch-title" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="VD: Giao ban Lãnh đạo cơ quan">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Thứ *</label>
+                        <select id="sch-day" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                            <option>Thứ 2</option><option>Thứ 3</option><option>Thứ 4</option><option>Thứ 5</option><option>Thứ 6</option><option>Thứ 7</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Giờ *</label>
+                        <input type="time" id="sch-time" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Chủ trì / Tham dự</label>
+                    <input type="text" id="sch-who" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-900" placeholder="Tên cán bộ / thành phần">
+                </div>
+                <div class="pt-1 flex justify-end gap-2">
+                    <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl">Hủy</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-blue-900 rounded-xl">Lưu lịch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 z-[60] hidden">
+        <div class="bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-msg"></span>
+        </div>
+    </div>
+
     <script>
-        // Default Tasks Data
-        let tasks = JSON.parse(localStorage.getItem('TCHC_TASKS')) || [
-            { id: 1, title: 'Rà soát hồ sơ nâng lương đợt 2', assignee: 'Trần Quốc Hoàn', deadline: '2026-08-15', status: 'In Progress' },
-            { id: 2, title: 'Kiểm tra công tác an toàn văn phòng', assignee: 'Huỳnh Thanh Ti', deadline: '2026-08-20', status: 'Done' },
-            { id: 3, title: 'Đào tạo kỹ năng số cho CB Một cửa', assignee: 'Nguyễn Thị Minh Thư', deadline: '2026-08-25', status: 'In Progress' },
-            { id: 4, title: 'Báo cáo tổng hợp thi đua khen thưởng', assignee: 'Đặng Thị Thùy Dung', deadline: '2026-08-30', status: 'In Progress' }
-        ];
+    /* ============ STORAGE (an toàn cả khi bị chặn localStorage) ============ */
+    const mem = {};
+    const store = {
+        get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return (k in mem) ? mem[k] : fb; } },
+        set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { mem[k] = v; } }
+    };
 
-        // Realtime Clock
-        setInterval(() => {
-            const d = new Date();
-            document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
-        }, 1000);
+    /* ============ DỮ LIỆU CÁN BỘ (theo Thông báo phân công) ============ */
+    const GROUPS = [
+        'Lãnh đạo Phòng',
+        'Tổ chức cán bộ - Tiền lương',
+        'Pháp chế - CCHC - Tổng hợp',
+        'Văn phòng - Quản trị',
+        'Một cửa - Lưu trữ'
+    ];
 
-        // Switch Views
-        function switchView(viewName) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-tasks').classList.add('hidden');
-            document.getElementById('view-staff').classList.add('hidden');
+    const STAFF = [
+        // Lãnh đạo
+        { name:'Đặng Hồng Quang', role:'Trưởng phòng', group:'Lãnh đạo Phòng', duty:'Quản lý, điều hành chung; trực tiếp chỉ đạo công tác tổ chức cán bộ, bảo vệ chính trị nội bộ, PCTN – tiêu cực; chịu trách nhiệm trước Giám đốc và pháp luật.' },
+        { name:'Huỳnh Thanh Ti', role:'Phó Trưởng phòng', group:'Lãnh đạo Phòng', duty:'Phụ trách Nhóm Văn phòng - Quản trị; bảo vệ bí mật nhà nước; quản lý, điều động xe ô tô Khối văn phòng.' },
+        { name:'Nguyễn Thành Nam', role:'Phó Trưởng phòng', group:'Lãnh đạo Phòng', duty:'Phụ trách Nhóm Pháp chế - CCHC - Tổng hợp; pháp chế; thi đua khen thưởng; đánh giá xếp loại; đào tạo bồi dưỡng.' },
+        { name:'Trần Quốc Hoàn', role:'Phó Trưởng phòng', group:'Lãnh đạo Phòng', duty:'Phụ trách Nhóm Tổ chức cán bộ; bảo vệ chính trị nội bộ; chế độ tiền lương; đầu mối điều phối công việc hằng ngày của Đảng ủy.' },
+        { name:'Nguyễn Thị Minh Thư', role:'Phó Trưởng phòng', group:'Lãnh đạo Phòng', duty:'Phụ trách Bộ phận Một cửa - Lưu trữ; kiểm soát TTHC; vận hành cơ chế một cửa, một cửa liên thông.' },
+        // Tổ chức cán bộ - Tiền lương (Trần Quốc Hoàn)
+        { name:'Hồ Thị Thùy Trang', role:'Chuyên viên', group:'Tổ chức cán bộ - Tiền lương', duty:'Đầu mối Tổ chức cán bộ: biên chế, tuyển dụng, quy hoạch, bổ nhiệm, điều động, kỷ luật; phần mềm Quản lý nhân sự.' },
+        { name:'Nguyễn Anh Dũng', role:'Chuyên viên', group:'Tổ chức cán bộ - Tiền lương', duty:'Nghiệp vụ công tác Đảng, BVCTNB (Trần Quốc Hoàn chỉ đạo chính); CCHC, CNTT - chuyển đổi số (Nguyễn Thành Nam chỉ đạo chuyên môn); tạm nhận một phần việc bà N.X.Minh.' },
+        { name:'Võ Thị Quế Phương', role:'Chuyên viên', group:'Tổ chức cán bộ - Tiền lương', duty:'Đầu mối chế độ, chính sách tiền lương: nâng lương, phụ cấp, bảng lương, thu nhập tăng thêm; chấm công; thư ký họp Phòng.' },
+        // Pháp chế - CCHC - Tổng hợp (Nguyễn Thành Nam)
+        { name:'Đặng Thị Thùy Dung', role:'Chuyên viên', group:'Pháp chế - CCHC - Tổng hợp', duty:'Đầu mối thi đua, khen thưởng; xét sáng kiến; đánh giá, xếp loại viên chức; phần mềm chấm công và TĐKT.' },
+        { name:'Đinh Hoàng Nữ Vi', role:'Chuyên viên', group:'Pháp chế - CCHC - Tổng hợp', duty:'Đầu mối pháp chế, quy chế, công tác đoàn thể; khởi kiện dân sự (Hoàn chỉ đạo); quản lý tài sản Khối Văn phòng (Ti chỉ đạo).' },
+        { name:'Đỗ Thị Sự', role:'Chuyên viên', group:'Pháp chế - CCHC - Tổng hợp', duty:'Đầu mối tổng hợp, báo cáo của BHXH TP và Phòng; thư ký giao ban; văn thư Đảng ủy; xử lý phản ánh, kiến nghị.' },
+        { name:'Nguyễn Xuân Minh', role:'Chuyên viên', group:'Pháp chế - CCHC - Tổng hợp', leave:true, duty:'Nghỉ chế độ thai sản (từ 6/2026). Tài sản → Đinh Hoàng Nữ Vi; phần còn lại → Nguyễn Anh Dũng.' },
+        // Văn phòng - Quản trị (Huỳnh Thanh Ti)
+        { name:'Nguyễn Thị Thu Hà', role:'Nhân viên', group:'Văn phòng - Quản trị', duty:'Đầu mối văn thư cơ quan; quản lý con dấu, thiết bị lưu khóa bí mật; bảo vệ BMNN; thủ kho hành chính - quản trị.' },
+        { name:'Lê Viết Thành', role:'Nhân viên', group:'Văn phòng - Quản trị', duty:'Đầu mối quản trị cơ sở vật chất, kỹ thuật trụ sở; điện, nước, âm thanh, ánh sáng; PCCC; phòng chống lụt bão.' },
+        { name:'Lê Văn Anh Cường', role:'Nhân viên lái xe', group:'Văn phòng - Quản trị', duty:'Quản lý, sử dụng xe ô tô biển 92A-004.95 theo Quy chế 425/QĐ-BHXH.' },
+        { name:'Ngô Sỹ Dũng', role:'Nhân viên lái xe', group:'Văn phòng - Quản trị', duty:'Quản lý, sử dụng xe ô tô biển 92A-00357 theo Quy chế 425/QĐ-BHXH.' },
+        { name:'Võ Ngọc Trung', role:'Nhân viên lái xe', group:'Văn phòng - Quản trị', duty:'Quản lý, sử dụng xe ô tô biển 92A-00319 theo Quy chế 425/QĐ-BHXH.' },
+        { name:'Lý Văn Thanh', role:'Nhân viên lái xe', group:'Văn phòng - Quản trị', duty:'Quản lý, sử dụng xe ô tô biển 92A-00487 theo Quy chế 425/QĐ-BHXH.' },
+        { name:'Phùng Tấn Thông', role:'Nhân viên bảo vệ', group:'Văn phòng - Quản trị', duty:'Bảo đảm an ninh, trật tự, an toàn tài sản; tuần tra, giám sát camera, kiểm soát ra vào, xử lý sự cố.' },
+        { name:'Đàm Quang Sơn', role:'Nhân viên bảo vệ', group:'Văn phòng - Quản trị', duty:'Bảo đảm an ninh, trật tự, an toàn tài sản; tuần tra, giám sát camera, kiểm soát ra vào, xử lý sự cố.' },
+        { name:'Mai Trọng Anh', role:'Nhân viên bảo vệ', group:'Văn phòng - Quản trị', duty:'Bảo đảm an ninh, trật tự, an toàn tài sản; tuần tra, giám sát camera, kiểm soát ra vào, xử lý sự cố.' },
+        { name:'Trương Thị Lan Thanh', role:'Bảo vệ kiêm tạp vụ', group:'Văn phòng - Quản trị', duty:'Bảo vệ cơ sở 02 Đinh Gia Khánh; vệ sinh phòng PGĐ Nguyễn Hùng Anh, Văn Phú Quân; thang máy P1; phòng họp tầng 4.' },
+        { name:'Lê Thị Mỹ Linh', role:'Bảo vệ kiêm tạp vụ', group:'Văn phòng - Quản trị', duty:'Bảo vệ; vệ sinh phòng Giám đốc và PGĐ Phạm Quốc Khánh, Lê Văn Tiến; thang máy P2; phòng họp tầng 5, hội trường tầng 10.' },
+        // Một cửa - Lưu trữ (Nguyễn Thị Minh Thư)
+        { name:'Nguyễn Thị Nga', role:'Chuyên viên', group:'Một cửa - Lưu trữ', duty:'Đầu mối một cửa lĩnh vực Thu, Sổ - Thẻ; tiếp nhận, trả kết quả; phê duyệt giao dịch điện tử cá nhân.' },
+        { name:'Trần Nguyễn Anh Thư', role:'Chuyên viên', group:'Một cửa - Lưu trữ', duty:'Đầu mối một cửa Chính sách, chi trả chế độ BHXH/BHTN; số hóa hồ sơ; theo dõi đặt lịch hẹn.' },
+        { name:'Võ Thị Noel', role:'Cán sự', group:'Một cửa - Lưu trữ', duty:'Đầu mối một cửa khu vực phân cấp và BHXH một lần; tạm nhận phần việc bà V.T.Kim Cúc.' },
+        { name:'Trần Minh Khoa', role:'Cán sự', group:'Một cửa - Lưu trữ', duty:'Đầu mối lưu trữ; quản lý kho, phần mềm lưu trữ hồ sơ điện tử; tiêu hủy tài liệu hết giá trị.' },
+        { name:'Võ Thị Kim Cúc', role:'Cán sự', group:'Một cửa - Lưu trữ', leave:true, duty:'Nghỉ chế độ thai sản (từ 6/2026). Phần việc một cửa tạm giao bà Võ Thị Noel.' }
+    ];
 
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-menu'));
+    const LEAD_OF_GROUP = {
+        'Tổ chức cán bộ - Tiền lương':'Trần Quốc Hoàn',
+        'Pháp chế - CCHC - Tổng hợp':'Nguyễn Thành Nam',
+        'Văn phòng - Quản trị':'Huỳnh Thanh Ti',
+        'Một cửa - Lưu trữ':'Nguyễn Thị Minh Thư',
+        'Lãnh đạo Phòng':'Đặng Hồng Quang'
+    };
 
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            document.getElementById(`nav-${viewName}`).classList.add('active-menu');
+    /* ============ 22 LĨNH VỰC (Phụ lục IX) ============ */
+    const AREAS = [
+        {no:1, area:'Tổ chức cán bộ', lead:'Trần Quốc Hoàn', owner:'Hồ Thị Thùy Trang', product:'Tờ trình, quyết định, hồ sơ', group:'Tổ chức cán bộ - Tiền lương'},
+        {no:2, area:'Công tác Đảng', lead:'Trần Quốc Hoàn', owner:'Nguyễn Anh Dũng', product:'Chương trình, nghị quyết, thông báo', group:'Tổ chức cán bộ - Tiền lương'},
+        {no:3, area:'Bảo vệ chính trị nội bộ', lead:'Trần Quốc Hoàn', owner:'Nguyễn Anh Dũng', product:'Báo cáo, hồ sơ thẩm tra', group:'Tổ chức cán bộ - Tiền lương'},
+        {no:4, area:'Chế độ tiền lương, nâng bậc/ngạch', lead:'Trần Quốc Hoàn', owner:'Võ Thị Quế Phương', product:'Bảng lương, quyết định nâng lương, hồ sơ', group:'Tổ chức cán bộ - Tiền lương'},
+        {no:5, area:'Thu nhập bổ sung/tăng thêm cho viên chức', lead:'Trần Quốc Hoàn', owner:'Võ Thị Quế Phương', product:'Bảng tính, chi trả (phối hợp Đặng Thị Thùy Dung)', group:'Tổ chức cán bộ - Tiền lương'},
+        {no:6, area:'Khởi kiện vụ án dân sự bảo vệ lợi ích Nhà nước', lead:'Trần Quốc Hoàn', owner:'Đinh Hoàng Nữ Vi', product:'Hồ sơ, tài liệu khởi kiện', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:7, area:'Pháp chế', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Văn bản thẩm định, rà soát', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:8, area:'Theo dõi thi hành pháp luật', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Báo cáo định kỳ', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:9, area:'Chế độ, chính sách với viên chức, NLĐ', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Hồ sơ tham gia, giải quyết chế độ', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:10, area:'Cải cách hành chính', lead:'Nguyễn Thành Nam', owner:'Nguyễn Anh Dũng', product:'Kế hoạch, báo cáo, chấm điểm', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:11, area:'Chuyển đổi số, CNTT (của Phòng)', lead:'Nguyễn Thành Nam', owner:'Nguyễn Anh Dũng', product:'Báo cáo, dữ liệu, hệ thống', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:12, area:'Thi đua – Khen thưởng', lead:'Nguyễn Thành Nam', owner:'Đặng Thị Thùy Dung', product:'Hồ sơ thi đua, báo cáo', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:13, area:'Đánh giá, xếp loại viên chức', lead:'Nguyễn Thành Nam', owner:'Đặng Thị Thùy Dung', product:'Hồ sơ đánh giá, xếp loại', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:14, area:'Đào tạo, bồi dưỡng', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Kế hoạch, báo cáo', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:15, area:'Thanh niên, bình đẳng giới, quy chế dân chủ', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Kế hoạch, báo cáo', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:16, area:'Ban Chỉ đạo chính sách BHXH, BHYT', lead:'Nguyễn Thành Nam', owner:'Đinh Hoàng Nữ Vi', product:'Hồ sơ, báo cáo', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:17, area:'Tổng hợp, báo cáo (BHXH TP + Phòng)', lead:'Nguyễn Thành Nam', owner:'Đỗ Thị Sự', product:'Báo cáo định kỳ/đột xuất', group:'Pháp chế - CCHC - Tổng hợp'},
+        {no:18, area:'Văn phòng – Quản trị', lead:'Huỳnh Thanh Ti', owner:'Nhóm Văn phòng - Quản trị', product:'Kế hoạch, báo cáo, hồ sơ', group:'Văn phòng - Quản trị'},
+        {no:19, area:'Văn thư', lead:'Huỳnh Thanh Ti', owner:'Nguyễn Thị Thu Hà', product:'Văn bản phát hành, hồ sơ', group:'Văn phòng - Quản trị'},
+        {no:20, area:'Quản lý tài sản Khối Văn phòng', lead:'Huỳnh Thanh Ti', owner:'Đinh Hoàng Nữ Vi', product:'Hồ sơ tài sản', group:'Văn phòng - Quản trị'},
+        {no:21, area:'Một cửa (tiếp nhận – trả kết quả TTHC)', lead:'Nguyễn Thị Minh Thư', owner:'Bộ phận Một cửa', product:'Hồ sơ tiếp nhận, trả kết quả', group:'Một cửa - Lưu trữ'},
+        {no:22, area:'Lưu trữ', lead:'Nguyễn Thị Minh Thư', owner:'Trần Minh Khoa', product:'Hồ sơ lưu trữ', group:'Một cửa - Lưu trữ'}
+    ];
 
-            const titleMap = {
-                'dashboard': 'BẢNG ĐIỀU HÀNH TCHC',
-                'tasks': 'QUẢN LÝ NHIỆM VỤ THEO THÁNG',
-                'staff': 'DANH SÁCH 27 CÁN BỘ PHÒNG TCHC'
-            };
-            document.getElementById('page-title').innerText = titleMap[viewName];
-        }
+    const KPIS = [
+        {g:'Tổ chức cán bộ', k:'Tỷ lệ hồ sơ nhân sự (bổ nhiệm, điều động, nâng lương…) trình đúng hạn, đúng quy trình 5 bước; số sai sót số liệu biên chế phải đính chính.', f:'Tháng'},
+        {g:'Pháp chế - CCHC - Tổng hợp', k:'Tỷ lệ văn bản, báo cáo tổng hợp nộp đúng hạn cho BHXH Việt Nam; số văn bản phải thẩm định lại do sai sót pháp lý.', f:'Tháng'},
+        {g:'Văn phòng - Quản trị', k:'Thời gian xử lý văn bản đến/đi theo quy định; tỷ lệ hoàn thành kế hoạch mua sắm, sửa chữa tài sản đúng tiến độ.', f:'Tháng'},
+        {g:'Một cửa - Lưu trữ', k:'Tỷ lệ hồ sơ TTHC trả đúng hạn, không trễ hẹn; tỷ lệ hồ sơ được số hóa, lưu trữ đúng quy định.', f:'Tháng'},
+        {g:'Lái xe, bảo vệ, tạp vụ', k:'Số sự cố an toàn, an ninh, PCCC; mức độ bảo đảm hậu cần cho các cuộc họp, sự kiện.', f:'Tháng'}
+    ];
 
-        // Modal Controls
-        function openModal() { document.getElementById('taskModal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
+    /* ============ DỮ LIỆU MẶC ĐỊNH ============ */
+    const DEFAULT_TASKS = [
+        { id:1, title:'Rà soát hồ sơ nâng lương thường xuyên đợt 2/2026', group:'Tổ chức cán bộ - Tiền lương', assignee:'Võ Thị Quế Phương', area:'Chế độ tiền lương, nâng bậc/ngạch', priority:'Cao', deadline:'2026-08-15', status:'Đang thực hiện', product:'Bảng lương, quyết định nâng lương', note:'' },
+        { id:2, title:'Kiểm tra công tác PCCC và an toàn trụ sở', group:'Văn phòng - Quản trị', assignee:'Lê Viết Thành', area:'Văn phòng – Quản trị', priority:'Trung bình', deadline:'2026-08-20', status:'Hoàn thành', product:'Biên bản kiểm tra', note:'' },
+        { id:3, title:'Tổng hợp báo cáo cải cách hành chính tháng 8', group:'Pháp chế - CCHC - Tổng hợp', assignee:'Nguyễn Anh Dũng', area:'Cải cách hành chính', priority:'Cao', deadline:'2026-08-25', status:'Đang thực hiện', product:'Báo cáo, chấm điểm CCHC', note:'Phối hợp Đỗ Thị Sự lấy số liệu.' },
+        { id:4, title:'Hồ sơ đánh giá, xếp loại viên chức quý III', group:'Pháp chế - CCHC - Tổng hợp', assignee:'Đặng Thị Thùy Dung', area:'Đánh giá, xếp loại viên chức', priority:'Trung bình', deadline:'2026-09-05', status:'Đang thực hiện', product:'Hồ sơ đánh giá, xếp loại', note:'' },
+        { id:5, title:'Kiểm tra tỷ lệ hồ sơ TTHC trả đúng hạn Bộ phận Một cửa', group:'Một cửa - Lưu trữ', assignee:'Nguyễn Thị Nga', area:'Một cửa (tiếp nhận – trả kết quả TTHC)', priority:'Trung bình', deadline:'2026-08-12', status:'Đang thực hiện', product:'Báo cáo số liệu cuối tháng', note:'' }
+    ];
+    const DEFAULT_SCHEDULE = [
+        { id:1, title:'Giao ban Lãnh đạo cơ quan', day:'Thứ 2', time:'08:00', who:'Đặng Hồng Quang' },
+        { id:2, title:'Họp Bộ phận Một cửa - Lưu trữ', day:'Thứ 3', time:'14:00', who:'Nguyễn Thị Minh Thư' },
+        { id:3, title:'Rà soát hồ sơ nâng lương đợt 2', day:'Thứ 5', time:'09:00', who:'Trần Quốc Hoàn' },
+        { id:4, title:'Sinh hoạt chuyên môn Nhóm Văn phòng - Quản trị', day:'Thứ 6', time:'15:30', who:'Huỳnh Thanh Ti' }
+    ];
 
-        // Task Functions
-        function saveNewTask(e) {
-            e.preventDefault();
-            const newTask = {
-                id: Date.now(),
-                title: document.getElementById('task-title').value,
-                assignee: document.getElementById('task-assignee').value,
-                deadline: document.getElementById('task-deadline').value,
-                status: 'In Progress'
-            };
-            tasks.push(newTask);
-            localStorage.setItem('TCHC_TASKS', JSON.stringify(tasks));
-            renderTasks();
-            updateStats();
-            closeModal();
-            e.target.reset();
-        }
+    let tasks = store.get('TCHC_TASKS_V5', null) || DEFAULT_TASKS;
+    let schedule = store.get('TCHC_SCHEDULE_V5', null) || DEFAULT_SCHEDULE;
+    let groupChart, statusChart;
 
-        function toggleTaskStatus(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task.status = task.status === 'Done' ? 'In Progress' : 'Done';
-                localStorage.setItem('TCHC_TASKS', JSON.stringify(tasks));
-                renderTasks();
-                updateStats();
-            }
-        }
+    /* ============ TIỆN ÍCH ============ */
+    const esc = s => (s??'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const todayStr = () => new Date().toISOString().split('T')[0];
+    const dayIdxNow = () => { const wd = new Date().getDay(); return wd===0 ? 'Chủ nhật' : 'Thứ ' + (wd+1); };
+    function isOverdue(t){ return t.status!=='Hoàn thành' && t.deadline && t.deadline < todayStr(); }
+    function daysLeft(t){ if(!t.deadline) return null; return Math.round((new Date(t.deadline)-new Date(todayStr()))/86400000); }
+    function initials(name){ const p=name.trim().split(' '); return (p[p.length-2]?.[0]||'')+(p[p.length-1]?.[0]||''); }
+    function saveAll(){ store.set('TCHC_TASKS_V5', tasks); store.set('TCHC_SCHEDULE_V5', schedule); }
+    function toast(msg, ok=true){
+        const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=msg;
+        const ic=document.getElementById('toast-icon');
+        ic.className = ok ? 'fa-solid fa-circle-check text-emerald-400' : 'fa-solid fa-circle-exclamation text-amber-400';
+        t.classList.remove('hidden'); clearTimeout(window.__tt); window.__tt=setTimeout(()=>t.classList.add('hidden'),2600);
+    }
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            localStorage.setItem('TCHC_TASKS', JSON.stringify(tasks));
-            renderTasks();
-            updateStats();
-        }
-
-        function renderTasks() {
-            const tbody = document.getElementById('tasks-table-body');
-            tbody.innerHTML = '';
-            tasks.forEach(t => {
-                const statusBadge = t.status === 'Done' 
-                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">Hoàn thành</span>'
-                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">Đang thực hiện</span>';
-                
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="p-3 font-bold text-slate-800">${t.title}</td>
-                        <td class="p-3 text-slate-600">${t.assignee}</td>
-                        <td class="p-3 text-slate-500">${t.deadline}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-right space-x-2">
-                            <button onclick="toggleTaskStatus(${t.id})" class="text-xs text-blue-900 font-bold hover:underline">Đổi trạng thái</button>
-                            <button onclick="deleteTask(${t.id})" class="text-xs text-rose-600 font-bold hover:underline">Xóa</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function updateStats() {
-            const total = tasks.length;
-            const done = tasks.filter(t => t.status === 'Done').length;
-            const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-
-            document.getElementById('stat-total-tasks').innerText = total;
-            document.getElementById('stat-done-tasks').innerText = done;
-            document.getElementById('stat-progress').innerText = `${progress}%`;
-        }
-
-        // Init Chart & Render
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTasks();
-            updateStats();
-
-            const ctx = document.getElementById('weeklyChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'],
-                    datasets: [{
-                        label: 'Số cuộc họp',
-                        data: [2, 1, 0, 1, 1, 0],
-                        backgroundColor: '#1e3a8a',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
+    /* ============ ĐIỀU HƯỚNG ============ */
+    function toggleSidebar(open){
+        const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay');
+        if(open){ sb.classList.remove('-translate-x-full'); ov.classList.remove('hidden'); }
+        else { sb.classList.add('-translate-x-full'); ov.classList.add('hidden'); }
+    }
+    function switchView(v){
+        ['dashboard','tasks','areas','staff','schedule'].forEach(x=>{
+            document.getElementById('view-'+x).classList.add('hidden');
+            document.getElementById('nav-'+x).classList.remove('active-menu');
         });
+        document.getElementById('view-'+v).classList.remove('hidden');
+        document.getElementById('nav-'+v).classList.add('active-menu');
+        const map={dashboard:'Bảng điều hành TCHC',tasks:'Quản lý nhiệm vụ',areas:'Lĩnh vực công tác · Phụ lục IX',staff:'Cán bộ Phòng TC-HC',schedule:'Lịch công tác tuần'};
+        document.getElementById('page-title').innerText=map[v];
+        if(v==='dashboard') updateDashboard();
+        if(window.innerWidth<768) toggleSidebar(false);
+    }
+
+    /* ============ SELECT ĐỘNG ============ */
+    function fillGroupSelects(){
+        const opts = GROUPS.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+        document.getElementById('task-group').innerHTML = opts;
+        document.getElementById('filter-group').innerHTML = `<option value="">Tất cả nhóm</option>`+opts;
+        document.getElementById('filter-assignee').innerHTML = `<option value="">Tất cả cán bộ</option>`+
+            STAFF.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
+        document.getElementById('task-area').innerHTML = `<option value="">— Không gắn lĩnh vực —</option>`+
+            AREAS.map(a=>`<option value="${esc(a.area)}">${a.no}. ${esc(a.area)}</option>`).join('');
+    }
+    function fillAssigneeSelect(id, group){
+        const sel=document.getElementById(id);
+        const list = group ? STAFF.filter(s=>s.group===group) : STAFF;
+        sel.innerHTML = list.map(s=>`<option value="${esc(s.name)}">${esc(s.name)} — ${esc(s.role)}${s.leave?' (nghỉ chế độ)':''}</option>`).join('');
+    }
+
+    /* ============ MODAL NHIỆM VỤ ============ */
+    function openTaskModal(prefill){
+        document.getElementById('task-id').value='';
+        document.getElementById('task-title').value='';
+        document.getElementById('task-product').value='';
+        document.getElementById('task-note').value='';
+        document.getElementById('task-priority').value='Trung bình';
+        document.getElementById('task-deadline').value=todayStr();
+        document.getElementById('task-modal-title').innerText='Thêm nhiệm vụ công tác';
+        document.getElementById('task-status-wrap').classList.add('hidden');
+        const g = prefill?.group || GROUPS[1];
+        document.getElementById('task-group').value=g;
+        fillAssigneeSelect('task-assignee', g);
+        if(prefill){
+            if(prefill.assignee) document.getElementById('task-assignee').value=prefill.assignee;
+            if(prefill.area) document.getElementById('task-area').value=prefill.area;
+            if(prefill.product) document.getElementById('task-product').value=prefill.product;
+            if(prefill.title) document.getElementById('task-title').value=prefill.title;
+        } else { document.getElementById('task-area').value=''; }
+        showModal('taskModal');
+    }
+    function editTask(id){
+        const t=tasks.find(x=>x.id===id); if(!t) return;
+        document.getElementById('task-id').value=t.id;
+        document.getElementById('task-title').value=t.title;
+        document.getElementById('task-group').value=t.group||GROUPS[1];
+        fillAssigneeSelect('task-assignee', t.group);
+        document.getElementById('task-assignee').value=t.assignee;
+        document.getElementById('task-area').value=t.area||'';
+        document.getElementById('task-priority').value=t.priority||'Trung bình';
+        document.getElementById('task-deadline').value=t.deadline;
+        document.getElementById('task-product').value=t.product||'';
+        document.getElementById('task-note').value=t.note||'';
+        document.getElementById('task-status').value=t.status;
+        document.getElementById('task-status-wrap').classList.remove('hidden');
+        document.getElementById('task-modal-title').innerText='Chỉnh sửa nhiệm vụ';
+        showModal('taskModal');
+    }
+    function saveTask(e){
+        e.preventDefault();
+        const id=document.getElementById('task-id').value;
+        const data={
+            title:document.getElementById('task-title').value.trim(),
+            group:document.getElementById('task-group').value,
+            assignee:document.getElementById('task-assignee').value,
+            area:document.getElementById('task-area').value,
+            priority:document.getElementById('task-priority').value,
+            deadline:document.getElementById('task-deadline').value,
+            product:document.getElementById('task-product').value.trim(),
+            note:document.getElementById('task-note').value.trim()
+        };
+        if(id){
+            const t=tasks.find(x=>x.id==id);
+            Object.assign(t,data,{status:document.getElementById('task-status').value});
+            toast('Đã cập nhật nhiệm vụ');
+        } else {
+            tasks.push({id:Date.now(),status:'Đang thực hiện',...data});
+            toast('Đã thêm nhiệm vụ mới');
+        }
+        saveAll(); renderTasks(); updateDashboard(); closeTaskModal();
+    }
+    function toggleTaskStatus(id){
+        const t=tasks.find(x=>x.id===id); if(!t) return;
+        t.status = t.status==='Hoàn thành' ? 'Đang thực hiện' : 'Hoàn thành';
+        saveAll(); renderTasks(); updateDashboard();
+    }
+    function deleteTask(id){
+        if(!confirm('Xóa nhiệm vụ này khỏi danh sách?')) return;
+        tasks=tasks.filter(x=>x.id!==id); saveAll(); renderTasks(); updateDashboard(); toast('Đã xóa nhiệm vụ');
+    }
+    function closeTaskModal(){ hideModal('taskModal'); }
+
+    /* ============ RENDER NHIỆM VỤ ============ */
+    const priBadge = p => ({'Cao':'bg-rose-100 text-rose-700','Trung bình':'bg-amber-100 text-amber-700','Thấp':'bg-slate-100 text-slate-600'}[p]||'bg-slate-100 text-slate-600');
+    const statBadge = s => ({'Hoàn thành':'bg-emerald-100 text-emerald-800','Đang thực hiện':'bg-blue-100 text-blue-800','Tạm dừng':'bg-slate-200 text-slate-600'}[s]||'bg-slate-100');
+
+    function renderTasks(){
+        const q=(document.getElementById('filter-search').value||'').toLowerCase();
+        const fg=document.getElementById('filter-group').value;
+        const fa=document.getElementById('filter-assignee').value;
+        const fs=document.getElementById('filter-status').value;
+        let list=tasks.filter(t=>{
+            if(fg && t.group!==fg) return false;
+            if(fa && t.assignee!==fa) return false;
+            if(fs==='__overdue'){ if(!isOverdue(t)) return false; }
+            else if(fs && t.status!==fs) return false;
+            if(q && !(t.title.toLowerCase().includes(q)||(t.assignee||'').toLowerCase().includes(q)||(t.area||'').toLowerCase().includes(q))) return false;
+            return true;
+        });
+        list.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
+        document.getElementById('task-count').innerText=list.length;
+        const tb=document.getElementById('tasks-table-body');
+        if(!list.length){ tb.innerHTML=`<tr><td colspan="7" class="p-8 text-center text-slate-400 text-xs font-bold">Chưa có nhiệm vụ phù hợp. Bấm “Thêm nhiệm vụ” để bắt đầu.</td></tr>`; return; }
+        tb.innerHTML=list.map(t=>{
+            const ov=isOverdue(t); const dl=daysLeft(t);
+            let dlNote='';
+            if(t.status!=='Hoàn thành'){
+                if(ov) dlNote=`<span class="text-rose-600">Quá hạn ${Math.abs(dl)} ngày</span>`;
+                else if(dl<=3) dlNote=`<span class="text-amber-600">Còn ${dl} ngày</span>`;
+            }
+            return `<tr class="${ov?'bg-rose-50/50':''}">
+                <td class="p-3 align-top">
+                    <p class="font-bold text-slate-800">${esc(t.title)}</p>
+                    ${t.product?`<p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-solid fa-file-lines mr-1"></i>${esc(t.product)}</p>`:''}
+                    ${t.note?`<p class="text-[10px] text-slate-400 mt-0.5 italic">${esc(t.note)}</p>`:''}
+                </td>
+                <td class="p-3 align-top"><span class="text-[10px] font-bold text-slate-600">${esc(t.group||'')}</span>${t.area?`<p class="text-[10px] text-slate-400 mt-0.5">${esc(t.area)}</p>`:''}</td>
+                <td class="p-3 align-top text-slate-600">${esc(t.assignee||'')}</td>
+                <td class="p-3 align-top"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${priBadge(t.priority)}">${esc(t.priority||'')}</span></td>
+                <td class="p-3 align-top text-slate-500">${esc(t.deadline||'')}<br>${dlNote}</td>
+                <td class="p-3 align-top"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${statBadge(t.status)}">${esc(t.status)}</span></td>
+                <td class="p-3 align-top text-right whitespace-nowrap">
+                    <button onclick="toggleTaskStatus(${t.id})" title="Đổi hoàn thành" class="text-emerald-600 hover:bg-emerald-50 w-7 h-7 rounded-lg"><i class="fa-solid fa-check"></i></button>
+                    <button onclick="editTask(${t.id})" title="Sửa" class="text-blue-900 hover:bg-blue-50 w-7 h-7 rounded-lg"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteTask(${t.id})" title="Xóa" class="text-rose-600 hover:bg-rose-50 w-7 h-7 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    /* ============ RENDER LĨNH VỰC ============ */
+    function renderAreas(){
+        const q=(document.getElementById('area-search').value||'').toLowerCase();
+        const rows=AREAS.filter(a=>!q||a.area.toLowerCase().includes(q)||a.owner.toLowerCase().includes(q)||a.lead.toLowerCase().includes(q));
+        document.getElementById('areas-table-body').innerHTML=rows.map(a=>`
+            <tr>
+                <td class="p-3 text-slate-400 font-bold">${a.no}</td>
+                <td class="p-3 font-bold text-slate-800">${esc(a.area)}</td>
+                <td class="p-3 text-slate-600">${esc(a.lead)}</td>
+                <td class="p-3"><span class="text-blue-900 font-bold">${esc(a.owner)}</span></td>
+                <td class="p-3 text-slate-500">${esc(a.product)}</td>
+                <td class="p-3 text-right"><button onclick='taskFromArea(${a.no})' class="text-[10px] font-bold text-blue-900 hover:underline whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i>Tạo việc</button></td>
+            </tr>`).join('') || `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-bold">Không tìm thấy lĩnh vực.</td></tr>`;
+        document.getElementById('kpi-grid').innerHTML=KPIS.map(k=>`
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                <p class="text-[11px] font-black text-slate-800">${esc(k.g)}</p>
+                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">${esc(k.k)}</p>
+                <span class="inline-block mt-2 text-[9px] font-extrabold bg-blue-100 text-blue-900 px-2 py-0.5 rounded-full uppercase">Tần suất: ${esc(k.f)}</span>
+            </div>`).join('');
+    }
+    function taskFromArea(no){
+        const a=AREAS.find(x=>x.no===no); if(!a) return;
+        const ownerIsPerson = STAFF.some(s=>s.name===a.owner);
+        openTaskModal({group:a.group, assignee: ownerIsPerson?a.owner:undefined, area:a.area, product:a.product, title:a.area+': '});
+        toast('Đã tạo nhiệm vụ từ lĩnh vực "'+a.area+'"');
+    }
+
+    /* ============ RENDER CÁN BỘ ============ */
+    function renderStaff(){
+        const q=(document.getElementById('staff-search').value||'').toLowerCase();
+        const wrap=document.getElementById('staff-container'); wrap.innerHTML='';
+        GROUPS.forEach(g=>{
+            let members=STAFF.filter(s=>s.group===g);
+            if(q) members=members.filter(s=>s.name.toLowerCase().includes(q)||s.role.toLowerCase().includes(q)||(s.duty||'').toLowerCase().includes(q));
+            if(!members.length) return;
+            const lead = g!=='Lãnh đạo Phòng' ? `<span class="text-[10px] font-bold text-slate-400">Chỉ đạo: ${esc(LEAD_OF_GROUP[g])}</span>` : '';
+            wrap.innerHTML+=`
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                    <h4 class="text-xs font-black uppercase text-blue-900">${esc(g)} <span class="text-slate-400">· ${members.length}</span></h4>
+                    ${lead}
+                </div>
+                <div class="divide-y divide-slate-100">
+                ${members.map(s=>`
+                    <div class="px-5 py-3 flex items-start gap-3 ${s.leave?'bg-amber-50/40':''}">
+                        <div class="w-9 h-9 rounded-full ${s.leave?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-900'} flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">${esc(initials(s.name))}</div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-extrabold text-slate-800">${esc(s.name)}
+                                <span class="ml-1 text-[10px] font-bold text-slate-400">· ${esc(s.role)}</span>
+                                ${s.leave?'<span class="ml-1 text-[9px] font-extrabold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full uppercase">Nghỉ chế độ</span>':''}
+                            </p>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">${esc(s.duty)}</p>
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        });
+        if(!wrap.innerHTML) wrap.innerHTML=`<div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-xs font-bold">Không tìm thấy cán bộ phù hợp.</div>`;
+    }
+
+    /* ============ LỊCH CÔNG TÁC ============ */
+    const DAYS=['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+    function openScheduleModal(){ document.getElementById('sch-title').value=''; document.getElementById('sch-time').value=''; document.getElementById('sch-who').value=''; showModal('scheduleModal'); }
+    function closeScheduleModal(){ hideModal('scheduleModal'); }
+    function saveSchedule(e){
+        e.preventDefault();
+        schedule.push({id:Date.now(),title:document.getElementById('sch-title').value.trim(),day:document.getElementById('sch-day').value,time:document.getElementById('sch-time').value,who:document.getElementById('sch-who').value.trim()});
+        saveAll(); renderSchedule(); updateDashboard(); closeScheduleModal(); toast('Đã thêm lịch công tác');
+    }
+    function deleteSchedule(id){ schedule=schedule.filter(x=>x.id!==id); saveAll(); renderSchedule(); updateDashboard(); }
+    function renderSchedule(){
+        const wrap=document.getElementById('schedule-container'); wrap.innerHTML='';
+        DAYS.forEach(d=>{
+            const items=schedule.filter(s=>s.day===d).sort((a,b)=>a.time.localeCompare(b.time));
+            const isToday = d===dayIdxNow();
+            wrap.innerHTML+=`
+            <div class="bg-white rounded-2xl border ${isToday?'border-blue-300 ring-1 ring-blue-100':'border-slate-200'} shadow-sm overflow-hidden">
+                <div class="px-4 py-2.5 ${isToday?'bg-blue-900 text-white':'bg-slate-50 text-slate-700'} flex items-center justify-between">
+                    <span class="text-xs font-black uppercase">${d}${isToday?' · Hôm nay':''}</span>
+                    <span class="text-[10px] font-bold ${isToday?'text-blue-100':'text-slate-400'}">${items.length} việc</span>
+                </div>
+                <div class="p-3 space-y-2 min-h-[60px]">
+                ${items.length?items.map(s=>`
+                    <div class="p-2.5 bg-slate-50 rounded-xl flex justify-between items-start gap-2 group">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-bold text-slate-800">${esc(s.title)}</p>
+                            ${s.who?`<p class="text-[10px] text-slate-400">${esc(s.who)}</p>`:''}
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">${esc(s.time)}</span>
+                            <button onclick="deleteSchedule(${s.id})" class="text-slate-300 hover:text-rose-500 text-[10px] opacity-0 group-hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>`).join(''):'<p class="text-[10px] text-slate-300 font-bold text-center py-3">Không có lịch</p>'}
+                </div>
+            </div>`;
+        });
+    }
+
+    /* ============ DASHBOARD ============ */
+    function updateDashboard(){
+        const total=tasks.length, done=tasks.filter(t=>t.status==='Hoàn thành').length;
+        const inprog=tasks.filter(t=>t.status==='Đang thực hiện').length;
+        const overdue=tasks.filter(isOverdue).length;
+        const soon=tasks.filter(t=>{const d=daysLeft(t);return t.status!=='Hoàn thành'&&!isOverdue(t)&&d!==null&&d<=3;}).length;
+        const active=STAFF.filter(s=>!s.leave).length, leave=STAFF.filter(s=>s.leave).length;
+        const pct=total?Math.round(done/total*100):0;
+        document.getElementById('stat-total').innerText=total;
+        document.getElementById('stat-done').innerText=done;
+        document.getElementById('stat-progress-count').innerText=inprog;
+        document.getElementById('stat-overdue').innerText=overdue;
+        document.getElementById('stat-soon').innerText=soon;
+        document.getElementById('stat-staff').innerText=STAFF.length;
+        document.getElementById('stat-onduty').innerText=active;
+        document.getElementById('stat-leave').innerText=leave;
+        document.getElementById('progress-label').innerText=pct+'%';
+        document.getElementById('progress-bar').style.width=pct+'%';
+
+        // Cảnh báo
+        const alerts=tasks.filter(t=>t.status!=='Hoàn thành'&&(isOverdue(t)||(daysLeft(t)!==null&&daysLeft(t)<=3)))
+            .sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
+        const al=document.getElementById('alert-list');
+        al.innerHTML = alerts.length?alerts.map(t=>{
+            const ov=isOverdue(t), dl=daysLeft(t);
+            return `<div class="p-2.5 rounded-xl flex justify-between items-center gap-2 ${ov?'bg-rose-50':'bg-amber-50'}">
+                <div class="min-w-0"><p class="text-[11px] font-bold text-slate-800 truncate">${esc(t.title)}</p><p class="text-[10px] text-slate-400">${esc(t.assignee||'')} · ${esc(t.deadline||'')}</p></div>
+                <span class="text-[10px] font-extrabold px-2 py-1 rounded-lg shrink-0 ${ov?'bg-rose-200 text-rose-800':'bg-amber-200 text-amber-800'}">${ov?'Quá '+Math.abs(dl)+'n':'Còn '+dl+'n'}</span>
+            </div>`;
+        }).join(''):'<p class="text-[11px] text-slate-400 font-bold text-center py-6"><i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i>Không có nhiệm vụ quá hạn hoặc sắp đến hạn.</p>';
+
+        // Lịch hôm nay
+        const today=schedule.filter(s=>s.day===dayIdxNow()).sort((a,b)=>a.time.localeCompare(b.time));
+        document.getElementById('today-schedule').innerHTML = today.length?today.map(s=>`
+            <div class="p-2.5 bg-slate-50 rounded-xl flex justify-between items-center">
+                <div><p class="text-[11px] font-bold text-slate-800">${esc(s.title)}</p><p class="text-[10px] text-slate-400">${esc(s.who||'')}</p></div>
+                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">${esc(s.time)}</span>
+            </div>`).join(''):'<p class="text-[11px] text-slate-400 font-bold text-center py-6">Hôm nay chưa có lịch công tác.</p>';
+
+        renderCharts();
+    }
+    function renderCharts(){
+        const byGroup=GROUPS.map(g=>tasks.filter(t=>t.group===g).length);
+        const gctx=document.getElementById('groupChart');
+        if(groupChart) groupChart.destroy();
+        groupChart=new Chart(gctx,{type:'bar',data:{labels:GROUPS.map(g=>g.replace(' - ',' -\n')),datasets:[{data:byGroup,backgroundColor:'#1e3a8a',borderRadius:8,maxBarThickness:46}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+        const done=tasks.filter(t=>t.status==='Hoàn thành').length;
+        const over=tasks.filter(isOverdue).length;
+        const prog=tasks.filter(t=>t.status==='Đang thực hiện'&&!isOverdue(t)).length;
+        const pause=tasks.filter(t=>t.status==='Tạm dừng').length;
+        const sctx=document.getElementById('statusChart');
+        if(statusChart) statusChart.destroy();
+        statusChart=new Chart(sctx,{type:'doughnut',data:{labels:['Hoàn thành','Đang thực hiện','Quá hạn','Tạm dừng'],datasets:[{data:[done,prog,over,pause],backgroundColor:['#10b981','#3b82f6','#f43f5e','#94a3b8'],borderWidth:0}]},
+            options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:10}}}}});
+    }
+
+    /* ============ MODAL HELPERS ============ */
+    function showModal(id){ const m=document.getElementById(id); m.classList.remove('hidden'); m.classList.add('flex'); }
+    function hideModal(id){ const m=document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+    /* ============ SAO LƯU DỮ LIỆU ============ */
+    function exportData(){
+        const blob=new Blob([JSON.stringify({tasks,schedule,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+        a.download='tchc-sao-luu-'+todayStr()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+        toast('Đã xuất file sao lưu');
+    }
+    function importData(e){
+        const f=e.target.files[0]; if(!f) return;
+        const r=new FileReader();
+        r.onload=()=>{ try{
+            const d=JSON.parse(r.result);
+            if(Array.isArray(d.tasks)) tasks=d.tasks;
+            if(Array.isArray(d.schedule)) schedule=d.schedule;
+            saveAll(); renderTasks(); renderSchedule(); updateDashboard(); toast('Đã nhập dữ liệu sao lưu');
+        }catch(err){ toast('File không hợp lệ',false); } };
+        r.readAsText(f); e.target.value='';
+    }
+    function resetData(){
+        if(!confirm('Khôi phục về dữ liệu mẫu ban đầu? Toàn bộ nhiệm vụ và lịch hiện tại sẽ bị thay thế.')) return;
+        tasks=JSON.parse(JSON.stringify(DEFAULT_TASKS)); schedule=JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+        saveAll(); renderTasks(); renderSchedule(); updateDashboard(); toast('Đã khôi phục dữ liệu mặc định');
+    }
+
+    /* ============ KHỞI TẠO ============ */
+    setInterval(()=>{ document.getElementById('clock').innerText=new Date().toTimeString().split(' ')[0]; },1000);
+    document.addEventListener('DOMContentLoaded',()=>{
+        fillGroupSelects();
+        fillAssigneeSelect('task-assignee', GROUPS[1]);
+        renderTasks(); renderAreas(); renderStaff(); renderSchedule(); updateDashboard();
+    });
     </script>
 </body>
 </html>
